@@ -80,3 +80,4 @@ def test_hallucinated_file_is_dropped(sample_repo):
 def test_parse_reply_handles_fences_and_extra_text():
     assert parse_reply('```json\n{"finish": true}\n```') == {"finish": True}
     assert parse_reply('sure: {"a": 1} thanks') == {"a": 1}
+    assert parse_reply('{"a": 1}\n{"b": 2}') == {"a": 1}

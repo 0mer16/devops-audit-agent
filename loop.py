@@ -30,10 +30,11 @@ def parse_reply(text):
     try:
         data = json.loads(cleaned)
     except json.JSONDecodeError:
-        start, end = cleaned.find("{"), cleaned.rfind("}")
-        if start == -1 or end <= start:
+        start = cleaned.find("{")
+        if start == -1:
             raise ValueError("no JSON object found")
-        data = json.loads(cleaned[start:end + 1])
+        # take the first complete object, ignore anything after it
+        data, _ = json.JSONDecoder().raw_decode(cleaned[start:])
     if isinstance(data, list) and data and isinstance(data[0], dict):
         data = data[0]
     if not isinstance(data, dict):
