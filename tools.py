@@ -44,7 +44,7 @@ class RepoTools:
             result = subprocess.run(
                 ["git", "-C", str(self.root), *args],
                 capture_output=True, text=True, encoding="utf-8", errors="replace",
-                timeout=CMD_TIMEOUT,
+                timeout=CMD_TIMEOUT, check=False,
             )
         except subprocess.TimeoutExpired:
             raise ToolError(f"git {' '.join(args)} timed out")
@@ -211,7 +211,7 @@ class RepoTools:
                 [exe, "check", "--no-cache", "--exit-zero", "--output-format", "concise",
                  "--select", "E9,F", "."],
                 cwd=self.root, capture_output=True, text=True, encoding="utf-8",
-                errors="replace", timeout=CMD_TIMEOUT,
+                errors="replace", timeout=CMD_TIMEOUT, check=False,
             )
         except subprocess.TimeoutExpired:
             return "CHECK UNAVAILABLE: ruff timed out"

@@ -40,7 +40,7 @@ def clone_repo(url, dest):
     env = dict(os.environ, GIT_TERMINAL_PROMPT="0")
     cmd = ["git", "clone", "--quiet", "--depth", "200", "--no-tags", url, dest]
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=CLONE_TIMEOUT, env=env)
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=CLONE_TIMEOUT, env=env, check=False)
     except FileNotFoundError:
         raise RuntimeError("git is not installed")
     except subprocess.TimeoutExpired:
