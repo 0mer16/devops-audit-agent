@@ -72,6 +72,8 @@ evidence: what you observed (never include secret values).
 recommendation: concrete fix.
 
 You have a limited step budget, so batch related tool calls and finish when you have enough evidence.
+Do not finish before you have at least looked at the commit history (git_log), searched for hardcoded
+secrets and machine-specific paths (search_code), and compared .gitignore with the tracked files.
 """
 
 
