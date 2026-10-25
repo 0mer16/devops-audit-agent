@@ -35,18 +35,27 @@ class GeminiLLM:
     def complete(self, system, messages):
         """messages: list of {"role": "user"|"model", "text": str}. Returns reply text."""
         types = self._types
-        contents = [types.Content(role=m["role"], parts=[types.Part(text=m["text"])]) for m in messages]
-        config = types.GenerateContentConfig(
-            system_instruction=system,
-            temperature=self.temperature,
-            response_mime_type="application/json",
+        # Gemini returned MALFORMED_FUNCTION_CALL when earlier JSON replies were sent back as
+        # "model" turns, so the history is sent as one plain transcript instead.
+        contents = "\n\n".join(
+            ("YOUR PREVIOUS REPLY:\n" + m["text"]) if m["role"] == "model" else m["text"]
+            for m in messages
         )
+        json_mode = True
         delay = 5
         for attempt in range(1, self.max_retries + 1):
+            config = types.GenerateContentConfig(
+                system_instruction=system,
+                temperature=self.temperature,
+                response_mime_type="application/json" if json_mode else None,
+            )
             try:
                 resp = self.client.models.generate_content(model=self.model, contents=contents, config=config)
                 text = resp.text
                 if not text:
+                    # some models return MALFORMED_RESPONSE in JSON mode; the loop can parse
+                    # plain text replies too, so retry without forcing JSON
+                    json_mode = False
                     raise LLMError("empty response from model")
                 return text
             except Exception as exc:
